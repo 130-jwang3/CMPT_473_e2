@@ -114,9 +114,78 @@ The output JSON file follows [RFC 8259](https://tools.ietf.org/html/rfc8259):
     ]
     ```
 
-### Limitations
-- **No Option to Remove Empty Rows**:  
-  The script removes empty rows by default, but there is no explicit argument to disable this behavior.
-  
-- **No Explicit Option for No Headers**:  
-  The `-H` flag is used to specify which line should be treated as headers. If no header is desired, default column names will be assigned automatically.
+## Input space partitioning
+
+```
+[System]
+
+Name: csv2json.py
+
+[Parameter]
+
+-- Environment
+
+Input_File_Exists: TRUE, FALSE
+Determines whether the input file exists before proceeding with testing.
+
+-- Command Flags
+
+Header_Line (enum): NO_HEADER, FIRST_LINE, SPECIFIC_LINE (>=2)
+NO_HEADER means there is no header.
+FIRST_LINE indicates the first line is the header.
+SPECIFIC_LINE indicates a header is present, but not the first line.
+
+Input_Source (enum): STDIN, DISKFILE
+Whether the input is read from standard input (STDIN) or from a file (DISKFILE).
+
+Output_Destination (enum): STDOUT, DISKFILE
+Whether the output JSON is printed to console (STDOUT) or written to a file (DISKFILE).
+
+Limit_Rows (boolean): TRUE, FALSE
+Indicates if there is a limit to the number of rows to be read (-N).
+
+Skip_Rows (boolean): TRUE, FALSE
+Indicates to skip a number of initial rows (-s).
+
+Custom_Column_Names (boolean): TRUE, FALSE
+Indicates if custom column names (-n) are used instead of those in the header.
+
+Column_Selection (enum): ALL_COLUMNS, LIMIT_COLUMNS, USE_SPECIFIC_COLUMNS
+ALL_COLUMNS: Include all columns.
+LIMIT_COLUMNS: Limit the number of columns using (-c).
+USE_SPECIFIC_COLUMNS: Only include specific columns provided in the command (-u).
+
+Explicit_Row_Selection (boolean): TRUE, FALSE
+Indicates if specific rows are explicitly selected (-r).
+
+Append_Columns (boolean): TRUE, FALSE
+Indicates additional columns are appended (-a).
+
+Print_Data (boolean): TRUE, FALSE
+Indicates the converted JSON data is printed to the console after conversion (-p).
+
+-- CSV File Spec
+
+Separator_Type (enum): COMMA, SEMICOLON, TAB, CUSTOM
+The separator used in the CSV file.
+
+Number_Of_Records (enum): ZERO, GTZERO
+Specifies whether there are no records (ZERO) or at least one (GTZERO).
+
+Field_Type_In_Record (enum): ESCAPED, NONESCAPED, MIXED
+The type of fields in each record, such as containing escaped characters (ESCAPED), not escaped (NONESCAPED), or a combination (MIXED).
+
+Consistent_Field_Count (boolean): TRUE, FALSE
+Indicates the number of fields in each row is consistent or not.
+
+[Constraint]
+
+Input_Source = "DISKFILE" → Input_File_Exists = TRUE
+Field_Type_In_Record = "ESCAPED" → Number_Of_Records = "GTZERO"
+Output_Destination = "DISKFILE"
+
+```
+### Constraints explanation
+
+The constraints guarantee that the test cases are reasonable and appropriate. To avoid concentrating on error-handling for missing files, Input_File_Exists must be TRUE if Input_Source is "DISKFILE". Testing escaped content with no records is absurd, thus real data (Number_Of_Records = "GTZERO") is required for Field_Type_In_Record = "ESCAPED". Finally, in order to enable direct output verification through file-based comparison, Output_Destination = "DISKFILE" is necessary. These limitations simplify the tests so that they only address circumstances that are realistic and meaningful.
+

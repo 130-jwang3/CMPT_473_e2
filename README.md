@@ -103,7 +103,7 @@ The output JSON file follows [RFC 8259](https://tools.ietf.org/html/rfc8259):
 
 2. **Command**:
     ```sh
-    python3 bin/csv2json/csv2json.py simpleTestRun/data.csv simpleTestRun/data.json
+    python3 bin/csv2json.py simpleTestRun/data.csv simpleTestRun/data.json
     ```
 
 3. **Output JSON File** (`data.json`):

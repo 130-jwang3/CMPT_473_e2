@@ -102,9 +102,9 @@ The output JSON file follows [RFC 8259](https://tools.ietf.org/html/rfc8259):
     ```
 
 2. **Command**:
-    ```sh
-    python3 bin/csv2json.py simpleTestRun/data.csv simpleTestRun/data.json
-    ```
+  ```sh
+    python bin/csv2json.py simpleTestRun/data.csv simpleTestRun/data.json
+  ```
 
 3. **Output JSON File** (`data.json`):
     ```json
@@ -118,74 +118,45 @@ The output JSON file follows [RFC 8259](https://tools.ietf.org/html/rfc8259):
 
 ```
 [System]
-
-Name: csv2json.py
+-- specify system name
+Name: csv2json pairwise test model
 
 [Parameter]
-
--- Environment
-
-Input_File_Exists: TRUE, FALSE
-Determines whether the input file exists before proceeding with testing.
-
--- Command Flags
-
-Header_Line (enum): NO_HEADER, FIRST_LINE, SPECIFIC_LINE (>=2)
-NO_HEADER means there is no header.
-FIRST_LINE indicates the first line is the header.
-SPECIFIC_LINE indicates a header is present, but not the first line.
-
-Input_Source (enum): STDIN, DISKFILE
-Whether the input is read from standard input (STDIN) or from a file (DISKFILE).
-
-Output_Destination (enum): STDOUT, DISKFILE
-Whether the output JSON is printed to console (STDOUT) or written to a file (DISKFILE).
-
-Limit_Rows (boolean): TRUE, FALSE
-Indicates if there is a limit to the number of rows to be read (-N).
-
-Skip_Rows (boolean): TRUE, FALSE
-Indicates to skip a number of initial rows (-s).
-
-Custom_Column_Names (boolean): TRUE, FALSE
-Indicates if custom column names (-n) are used instead of those in the header.
-
-Column_Selection (enum): ALL_COLUMNS, LIMIT_COLUMNS, USE_SPECIFIC_COLUMNS
-ALL_COLUMNS: Include all columns.
-LIMIT_COLUMNS: Limit the number of columns using (-c).
-USE_SPECIFIC_COLUMNS: Only include specific columns provided in the command (-u).
-
-Explicit_Row_Selection (boolean): TRUE, FALSE
-Indicates if specific rows are explicitly selected (-r).
-
-Append_Columns (boolean): TRUE, FALSE
-Indicates additional columns are appended (-a).
-
-Print_Data (boolean): TRUE, FALSE
-Indicates the converted JSON data is printed to the console after conversion (-p).
-
--- CSV File Spec
-
-Separator_Type (enum): COMMA, SEMICOLON, TAB, CUSTOM
-The separator used in the CSV file.
-
-Number_Of_Records (enum): ZERO, GTZERO
-Specifies whether there are no records (ZERO) or at least one (GTZERO).
-
-Field_Type_In_Record (enum): ESCAPED, NONESCAPED, MIXED
-The type of fields in each record, such as containing escaped characters (ESCAPED), not escaped (NONESCAPED), or a combination (MIXED).
-
-Consistent_Field_Count (boolean): TRUE, FALSE
-Indicates the number of fields in each row is consistent or not.
+-- general syntax is parameter_name : value1, value2, ...
+Input_File_Exists (boolean) : true, false
+Header_Line (enum) : NO_HEADER, FIRST_LINE, SPECIFIC_LINE(>=2)
+Input_Source (enum) : STDIN, DISKFILE
+Output_Destination (enum) : STDOUT, DISKFILE
+Limit_Rows (boolean) : true, false
+Skip_Rows (boolean) : true, false
+Custom_Column_Names (boolean) : true, false
+Column_Selection (enum) : ALL_COLUMNS, LIMIT_COLUMNS, USE_SPECIFIC_COLUMNS
+Explicit_Row_Selection (boolean) : true, false
+Append_Columns (boolean) : true, false
+Print_Data (boolean) : true, false
+Separator_Type (enum) : COMMA, SEMICOLON, TAB, CUSTOM
+Number_Of_Records (enum) : ZERO, GTZERO
+Consistent_Field_Count (boolean) : true, false
+Field_Type_In_Record (enum) : ESCAPED, NONESCAPED, MIXED
 
 [Constraint]
+-- this section is also optional
+Input_Source="DISKFILE"=>Input_File_Exists=TRUE
+Output_Destination="DISKFILE"
+(Field_Type_In_Record == "ESCAPED" || Field_Type_In_Record == "NONESCAPED") => Number_Of_Records == "GTZERO"
+ 
+Input_File_Exists==TRUE
+Input_Source=="DISKFILE"
 
-Input_Source = "DISKFILE" → Input_File_Exists = TRUE
-Field_Type_In_Record = "ESCAPED" → Number_Of_Records = "GTZERO"
-Output_Destination = "DISKFILE"
 
 ```
 ### Constraints explanation
 
-The constraints guarantee that the test cases are reasonable and appropriate. To avoid concentrating on error-handling for missing files, Input_File_Exists must be TRUE if Input_Source is "DISKFILE". Testing escaped content with no records is absurd, thus real data (Number_Of_Records = "GTZERO") is required for Field_Type_In_Record = "ESCAPED". Finally, in order to enable direct output verification through file-based comparison, Output_Destination = "DISKFILE" is necessary. These limitations simplify the tests so that they only address circumstances that are realistic and meaningful.
+The constraints guarantee that the test cases are reasonable and appropriate. To avoid concentrating on error-handling for missing files, Input_File_Exists must be TRUE if Input_Source is "DISKFILE". Similarly Input_File_Exists = TRUE is used to ensure the majority of test cases focus on validating the actual conversion functionality of the program. The second constraint specifies that if Field_Type_In_Record is "ESCAPED" or "NONESCAPED", Number_Of_Records must be "GTZERO" because testing escaped or unescaped fields without any records would be illogical. Finally, in order to enable direct output verification through file-based comparison, Output_Destination = "DISKFILE" is necessary. These limitations simplify the tests so that they only address circumstances that are realistic and meaningful.
 
+
+
+## Running all ACT generated tests with Shell
+ ```sh
+    sh ./run_all_tests.sh
+  ```

@@ -1,0 +1,8 @@
+Converting TestData/TestFiles/test_1.csv -> TestData/ActualOutput/test_1.json [sep=,, header=0]
+Only using columns: id name
+Only keeping rows: 0
+Adding column: new_col1
+Adding column: new_col2
+Empty DataFrame
+Columns: [custom_id, custom_name, custom_new_col1, custom_new_col2]
+Index: []

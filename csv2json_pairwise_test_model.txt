@@ -1,0 +1,51 @@
+[System]
+-- specify system name
+Name: csv2json pairwise test model
+
+[Parameter]
+-- general syntax is parameter_name : value1, value2, ...
+Input_File_Exists (boolean) : true, false
+Header_Line (enum) : NO_HEADER, FIRST_LINE, SPECIFIC_LINE(>=2)
+Input_Source (enum) : STDIN, DISKFILE
+Output_Destination (enum) : STDOUT, DISKFILE
+Limit_Rows (boolean) : true, false
+Skip_Rows (boolean) : true, false
+Custom_Column_Names (boolean) : true, false
+Column_Selection (enum) : ALL_COLUMNS, LIMIT_COLUMNS, USE_SPECIFIC_COLUMNS
+Explicit_Row_Selection (boolean) : true, false
+Append_Columns (boolean) : true, false
+Print_Data (boolean) : true, false
+Separator_Type (enum) : COMMA, SEMICOLON, TAB, CUSTOM
+Number_Of_Records (enum) : ZERO, GTZERO
+Consistent_Field_Count (boolean) : true, false
+Field_Type_In_Record (enum) : ESCAPED, NONESCAPED, MIXED
+
+[Relation]
+-- this section is optional
+-- general format Rx : (p1, p2, ..., pk, Strength)
+
+[Constraint]
+-- this section is also optional
+Input_Source="DISKFILE"=>Input_File_Exists=TRUE
+Output_Destination="DISKFILE"
+(Field_Type_In_Record == "ESCAPED" || Field_Type_In_Record == "NONESCAPED") => Number_Of_Records == "GTZERO" 
+Input_File_Exists==TRUE
+Input_Source=="DISKFILE"
+
+[Test Set]
+-- set existing test set for extend mode. this is also optional
+-- * represents don't-care value
+Input_File_Exists,Header_Line,Input_Source,Output_Destination,Limit_Rows,Skip_Rows,Custom_Column_Names,Column_Selection,Explicit_Row_Selection,Append_Columns,Print_Data,Separator_Type,Number_Of_Records,Consistent_Field_Count,Field_Type_In_Record
+true,NO_HEADER,DISKFILE,DISKFILE,false,false,false,LIMIT_COLUMNS,false,false,false,COMMA,GTZERO,false,NONESCAPED
+true,FIRST_LINE,DISKFILE,DISKFILE,true,true,true,USE_SPECIFIC_COLUMNS,true,true,true,COMMA,ZERO,true,MIXED
+true,SPECIFIC_LINE(>=2),DISKFILE,DISKFILE,false,true,false,ALL_COLUMNS,true,false,true,COMMA,GTZERO,true,ESCAPED
+true,NO_HEADER,DISKFILE,DISKFILE,true,false,true,USE_SPECIFIC_COLUMNS,false,true,false,SEMICOLON,GTZERO,false,ESCAPED
+true,FIRST_LINE,DISKFILE,DISKFILE,false,true,true,ALL_COLUMNS,false,false,true,SEMICOLON,GTZERO,false,NONESCAPED
+true,SPECIFIC_LINE(>=2),DISKFILE,DISKFILE,true,false,false,LIMIT_COLUMNS,true,true,false,SEMICOLON,ZERO,true,MIXED
+true,NO_HEADER,DISKFILE,DISKFILE,false,true,true,ALL_COLUMNS,false,true,false,TAB,ZERO,false,MIXED
+true,FIRST_LINE,DISKFILE,DISKFILE,true,false,false,LIMIT_COLUMNS,true,false,true,TAB,GTZERO,true,ESCAPED
+true,SPECIFIC_LINE(>=2),DISKFILE,DISKFILE,false,true,true,USE_SPECIFIC_COLUMNS,false,true,true,TAB,GTZERO,true,NONESCAPED
+true,NO_HEADER,DISKFILE,DISKFILE,true,false,false,ALL_COLUMNS,true,false,true,CUSTOM,ZERO,false,MIXED
+true,FIRST_LINE,DISKFILE,DISKFILE,false,true,true,LIMIT_COLUMNS,false,true,false,CUSTOM,GTZERO,true,ESCAPED
+true,SPECIFIC_LINE(>=2),DISKFILE,DISKFILE,true,true,false,USE_SPECIFIC_COLUMNS,true,false,true,CUSTOM,GTZERO,false,NONESCAPED
+true,NO_HEADER,DISKFILE,DISKFILE,false,false,true,ALL_COLUMNS,false,false,false,SEMICOLON,GTZERO,true,MIXED

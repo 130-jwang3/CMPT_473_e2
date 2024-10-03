@@ -1,0 +1,4 @@
+Converting TestData/TestFiles/test_5.csv -> TestData/ActualOutput/test_5.json [sep=;, header=1]
+Only keeping rows: 1 2
+Adding column: appended_col1
+Adding column: appended_col2

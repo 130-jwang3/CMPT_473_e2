@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "C:\Users\johnw\Documents\SFU\year_5\projects\CMPT473\e2\bin\csv2json.py", line 81, in <module>
+    df.columns = args.names
+    ^^^^^^^^^^
+  File "C:\Users\johnw\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pandas\core\generic.py", line 6218, in __setattr__
+    return object.__setattr__(self, name, value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "properties.pyx", line 69, in pandas._libs.properties.AxisProperty.__set__
+  File "C:\Users\johnw\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pandas\core\generic.py", line 767, in _set_axis
+    self._mgr.set_axis(axis, labels)
+  File "C:\Users\johnw\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pandas\core\internals\managers.py", line 227, in set_axis
+    self._validate_set_axis(axis, new_labels)
+  File "C:\Users\johnw\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pandas\core\internals\base.py", line 85, in _validate_set_axis
+    raise ValueError(
+ValueError: Length mismatch: Expected axis has 4 elements, new values have 6 elements

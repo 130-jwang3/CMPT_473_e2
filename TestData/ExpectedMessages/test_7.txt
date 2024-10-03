@@ -1,0 +1,4 @@
+Converting TestData/TestFiles/test_7.csv -> TestData/ActualOutput/test_7.json [sep=     , header=0]
+Only keeping rows: 1 2
+   id         name  age           city
+1   2  Jane, Smith   30  San Francisco

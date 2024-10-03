@@ -1,0 +1,7 @@
+# Metadata or comments, ignored by the header
+# Metadata or comments, ignored by skip row
+id|name|age|city
+2|Jane Smith|30|Los Angeles
+3|Sam Johnson|40|Chicago
+4|Emily Davis|22
+5|Alex Brown|29|Seattle

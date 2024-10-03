@@ -5,6 +5,19 @@ CMPT 473 FALL 2024
 
 ---
 
+## Prerequisites
+
+To successfully run this program, ensure that the following tools are installed and properly configured on your system:
+
+1. Python: The `csv2json.py` script is written in Python, so you'll need Python installed on your machine. Version 3.6 or higher is recommended.
+2. Pandas: The script relies on the **pandas** library for data manipulation. You can install Pandas using the following command:
+```sh
+pip install pandas
+```
+4. Shell: The test harness (`run_all_tests.sh`) is a shell script, and a compatible shell environment is required to execute it. On Windows, it is recommended to use **Git Bash** as the terminal to provide a Unix-like environment.
+
+---
+
 ## Setup Instructions
 
 To run the test harness and the `csv2json` program, you need to clone my repository. The repository contains the `csv2json.py` Python script as well as the test harness and data files necessary to perform the testing.
@@ -14,6 +27,7 @@ Clone the repository using the following command:
 ```sh
 git clone git@github.com:130-jwang3/CMPT_473_e2.git
 ```
+
 ## Specification of Program Under Test (PUT)
 
 ### Program Under Test: `csv2json.py`
@@ -80,7 +94,7 @@ The input CSV file should follow [RFC 4180](https://tools.ietf.org/html/rfc4180)
 - **Field Separator**:  
   The default field separator is a comma `,`, but it can be customized using the `-S` flag.
 
-- **Headers**:  
+- **Headers**:  (did not satisfy)
   By default, no headers are assumed (`-H 0`). The user can specify which line should be treated as the header using the `-H` flag. If no headers are provided, default names will be used for columns.
 
 - **Fields**:  
@@ -102,9 +116,9 @@ The output JSON file follows [RFC 8259](https://tools.ietf.org/html/rfc8259):
     ```
 
 2. **Command**:
-  ```sh
-    python bin/csv2json.py simpleTestRun/data.csv simpleTestRun/data.json
-  ```
+```sh
+python bin/csv2json.py simpleTestRun/data.csv simpleTestRun/data.json
+```
 
 3. **Output JSON File** (`data.json`):
     ```json
@@ -116,7 +130,7 @@ The output JSON file follows [RFC 8259](https://tools.ietf.org/html/rfc8259):
 
 ## Input space partitioning
 
-```
+```textmate
 [System]
 -- specify system name
 Name: csv2json pairwise test model
@@ -147,16 +161,59 @@ Output_Destination="DISKFILE"
  
 Input_File_Exists==TRUE
 Input_Source=="DISKFILE"
-
-
 ```
 ### Constraints explanation
 
-The constraints guarantee that the test cases are reasonable and appropriate. To avoid concentrating on error-handling for missing files, Input_File_Exists must be TRUE if Input_Source is "DISKFILE". Similarly Input_File_Exists = TRUE is used to ensure the majority of test cases focus on validating the actual conversion functionality of the program. The second constraint specifies that if Field_Type_In_Record is "ESCAPED" or "NONESCAPED", Number_Of_Records must be "GTZERO" because testing escaped or unescaped fields without any records would be illogical. Finally, in order to enable direct output verification through file-based comparison, Output_Destination = "DISKFILE" is necessary. These limitations simplify the tests so that they only address circumstances that are realistic and meaningful.
+The following constraints ensure meaningful and realistic test cases:
 
+1. Input Source and File Existence:
+   - If Input_Source is "DISKFILE", then Input_File_Exists must be TRUE.
+   - All tests assume the input file exists (Input_File_Exists == TRUE) and use a disk file (Input_Source == "DISKFILE").
+2. Output Destination:
+   - The output must be a disk file (Output_Destination == "DISKFILE") to enable file-based verification.
+3. Field Type and Records:
+   - If Field_Type_In_Record is "ESCAPED" or "NONESCAPED", there must be records available (Number_Of_Records == "GTZERO").
 
+These constraints simplify the tests by avoiding **unrealistic** or **error-specific** scenarios, focusing instead on validating the conversion functionality.
 
 ## Running all ACT generated tests with Shell
- ```sh
-    sh ./run_all_tests.sh
-  ```
+```sh
+sh ./run_all_tests.sh
+```
+## Final Report
+
+### How many tests did ACT generate? 
+13
+
+### How many of these tests were successful/passing?
+4
+
+### How many tests would have been generated if I didn't use pairwise testing?
+221,184 (by combining all the possible input parameter partition)
+
+
+### Tradeoffs of Pairwise Testing
+
+While pairwise testing is efficient and allows for a broad coverage of parameter interactions, there are limitations and tradeoffs:
+
+- **Limited Coverage of Higher-Order Interactions:**
+  - Pairwise testing focuses on covering every pair of parameter values at least once, which means higher-order interactions involving three or more parameters may not be fully tested. For instance, specific combinations involving more than two interacting variables might be missed if those combinations are particularly problematic.
+
+This implies that bugs that might be caused by a combination of 3 or more factors go untested.
+
+### Errors Discovered During Testing
+The following errors and limitations were discovered in the `csv2json.py` program during the evaluation:
+1. No Option to Set Header Line to None:
+   - The program did not have an option to specify `None` as the value for the `--headerline` parameter. This led to issues when attempting to handle CSV files that did not contain any header rows. For example, attempting to specify a header line as "None" resulted in argument parsing errors. Such limitation restricts the flexibility of the tool and violates the [RFC 4180](https://tools.ietf.org/html/rfc4180) specifications.
+2. Inconsistent Number of Fields Per Row:
+   - The program did not properly handle cases where rows in the CSV file had different numbers of fields. If the number of fields per row varied, it would often lead to errors or incorrect parsing behavior, preventing successful conversion to JSON. This inconsistency is common in messy or real-world data, highlighting a robustness issue in the implementation.
+3. Tab Separator Not Accepted:
+   - The program could not handle `\t` (tab) as a separator correctly. Although the shell script attempted to pass the tab character using `-S` `$'\t'`, the program would fail to parse the separator argument properly. This suggests an issue either with how arguments are parsed or with the handling of escape sequences, which significantly limits the ability to work with tab-delimited files.
+4. Order of Operations Affecting Limit Columns:
+   - The `--columns` parameter did not work as intended due to the order in which operations were applied based on the provided flags. Specifically, applying row selection, skipping rows, or appending columns before limiting columns could cause unexpected results or prevent columns from being properly limited. This indicates a design flaw in the sequence of execution of the program.
+
+## Reflection on experience.
+
+Looking back, it was comparatively easy to build up the first testing infrastructure using shell scripting, and ACT's ability to produce paired tests substantially decreased the amount of tests needed while ensuring meaningful coverage. This made the testing process efficient, as it avoided the exhaustive nature of full combinatorial testing. However, creating test cases that fulfilled the test oracle was difficult because it necessitated carefully structuring inputs and expected outputs that corresponded with the specifications.
+
+Managing special characters, like tabs, across several contexts and handling edge cases, such incorrect CSV data, caused challenges as well. Several problems would have been avoided if the Python program had included a more reliable argument validation method. Additionally, using an integrated testing framework such as pytest could have made the process go smoothly, especially when handling complex edge cases and JSON outputs. Pairwise testing effectively revealed important issues with data consistency and argument handling, but there are definitely cases that I did not cover.

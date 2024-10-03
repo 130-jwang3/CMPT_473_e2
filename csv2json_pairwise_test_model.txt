@@ -28,7 +28,7 @@ Field_Type_In_Record (enum) : ESCAPED, NONESCAPED, MIXED
 -- this section is also optional
 Input_Source="DISKFILE"=>Input_File_Exists=TRUE
 Output_Destination="DISKFILE"
-(Field_Type_In_Record == "ESCAPED" || Field_Type_In_Record == "NONESCAPED") => Number_Of_Records == "GTZERO" 
+(Field_Type_In_Record == "ESCAPED" || Field_Type_In_Record == "NONESCAPED") => Number_Of_Records == "GTZERO"
 Input_File_Exists==TRUE
 Input_Source=="DISKFILE"
 

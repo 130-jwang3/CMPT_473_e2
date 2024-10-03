@@ -1,0 +1,6 @@
+usage: csv2json.py [-h] [-S SEPARATOR] [-H HEADERLINE] [-c COLUMNS]
+                   [-u USECOLS [USECOLS ...]] [-n NAMES [NAMES ...]]
+                   [-N NROWS] [-s SKIPROWS] [-r USEROWS [USEROWS ...]]
+                   [-a APPEND [APPEND ...]] [-p]
+                   [infile] [outfile]
+csv2json.py: error: argument -H/--headerline: invalid int value: 'None'

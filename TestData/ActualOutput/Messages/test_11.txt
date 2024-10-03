@@ -1,0 +1,5 @@
+Converting TestData/TestFiles/test_11.csv -> TestData/ActualOutput/test_11.json [sep=|, header=1]
+Only using columns: id age
+Only keeping rows: 1 2
+   id  age
+1   3   40

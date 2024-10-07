@@ -1,6 +1,8 @@
 # Assignment 2 Report
 LeTian Wang
+
 301421744
+
 CMPT 473 FALL 2024
 
 ---
@@ -199,18 +201,53 @@ While pairwise testing is efficient and allows for a broad coverage of parameter
 - **Limited Coverage of Higher-Order Interactions:**
   - Pairwise testing focuses on covering every pair of parameter values at least once, which means higher-order interactions involving three or more parameters may not be fully tested. For instance, specific combinations involving more than two interacting variables might be missed if those combinations are particularly problematic.
 
-This implies that bugs that might be caused by a combination of 3 or more factors go untested.
+- **Example**:
+  - Consider the following three-way parameter combination:
+    ```
+    Header Line: SPECIFIC_LINE (>=2)
+    Column Selection: LIMIT_COLUMNS
+    Separator Type: CUSTOM
+    ```
+    This combination implies the following:
 
+    - The header is taken from a specific line in the CSV file that is greater than or equal to line 2 (SPECIFIC_LINE (>=2)).
+    - Choose to limit to only a specific line rather than using all columns or specific columns
+    - The separator being used is a custom separator that is not one of the typical options (CUSTOM)
+- In pairwise testing, the goal is to test all pairs of parameter values to ensure their interactions are covered. However, three-way combinations might not be fully tested if they involve three specific conditions that could lead to unique issues.
+  - In this specific case:
+    - Pairwise testing might test the combination of SPECIFIC_LINE (>=2) with a default separator, or LIMIT_COLUMNS with a standard separator like a comma.
+    - It might also test the custom separator with either ALL_COLUMNS or USE_SPECIFIC_COLUMNS. 
+
+  However, it may miss testing the interaction of using a header from a specific line, limiting columns, and a custom separator simultaneously, which could lead to unique parsing or formatting errors.
 ### Errors Discovered During Testing
 The following errors and limitations were discovered in the `csv2json.py` program during the evaluation:
 1. No Option to Set Header Line to None:
    - The program did not have an option to specify `None` as the value for the `--headerline` parameter. This led to issues when attempting to handle CSV files that did not contain any header rows. For example, attempting to specify a header line as "None" resulted in argument parsing errors. Such limitation restricts the flexibility of the tool and violates the [RFC 4180](https://tools.ietf.org/html/rfc4180) specifications.
+   - **Example:** Attempting to convert a CSV without a header line using:
+    `python3 bin/csv2json.py TestData/TestFiles/no_header.csv TestData/ActualOutput/no_header.json --headerline None`
+     would fail, resulting in a parsing error, as the program lacked an appropriate mechanism to interpret None as a valid argument for the --headerline flag.
 2. Inconsistent Number of Fields Per Row:
    - The program did not properly handle cases where rows in the CSV file had different numbers of fields. If the number of fields per row varied, it would often lead to errors or incorrect parsing behavior, preventing successful conversion to JSON. This inconsistency is common in messy or real-world data, highlighting a robustness issue in the implementation.
+   - **Example:** Consider the following CSV (`inconsistent_fields.csv`):
+    ```csv
+    id, name, age
+    1, Alice, 30
+    2, Bob
+    3, Charlie, 25, ExtraValue
+    ```
+    - Running the conversion:
+    `python3 bin/csv2json.py TestData/TestFiles/inconsistent_fields.csv TestData/ActualOutput/inconsistent_fields.json -H 0` This would result in an error due to the row with an extra value or a missing value.
+
 3. Tab Separator Not Accepted:
    - The program could not handle `\t` (tab) as a separator correctly. Although the shell script attempted to pass the tab character using `-S` `$'\t'`, the program would fail to parse the separator argument properly. This suggests an issue either with how arguments are parsed or with the handling of escape sequences, which significantly limits the ability to work with tab-delimited files.
+   - Example: Running the script with a tab-separated file:
+`python3 bin/csv2json.py TestData/TestFiles/tab_separated.csv TestData/ActualOutput/tab_separated.json -S $'\t'
+`would fail to recognize \t as the separator.
 4. Order of Operations Affecting Limit Columns:
    - The `--columns` parameter did not work as intended due to the order in which operations were applied based on the provided flags. Specifically, applying row selection, skipping rows, or appending columns before limiting columns could cause unexpected results or prevent columns from being properly limited. This indicates a design flaw in the sequence of execution of the program.
+   - Example: When using:
+`python3 bin/csv2json.py TestData/TestFiles/sample.csv TestData/ActualOutput/sample_output.json --columns 2 --userows 1 3 --append extra_col
+`The program first selects specific rows (1 and 3) and appends columns before limiting the number of columns, resulting in unexpected data.
 
 ## Reflection on experience.
 
